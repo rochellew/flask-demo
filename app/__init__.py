@@ -8,6 +8,7 @@ def create_app():
     load_dotenv()
 
     app = Flask(__name__)
+    app.jinja_env.autoescape = True
     app.config.from_prefixed_env() # reads FLASK_* .env variables
     app.config.setdefault("SQLALCHEMY_DATABASE_URI", "sqlite:///users.db")
     app.config.setdefault("SQLALCHEMY_TRACK_MODIFICATIONS", False)
