@@ -1,13 +1,23 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from .extensions import db # from extensions.py, import the `db` object
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import String
 
-class User(UserMixin, db.Model):
+from typing import TYPE_CHECKING
+from .extensions import db
+
+# Pyright can't see that db.Model is built from our Base, so point it at Base directly
+if TYPE_CHECKING:
+    from .extensions import Base as Model
+else:
+    Model = db.Model
+
+class User(UserMixin, Model):
     __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), unique=True, nullable=False)
-    password_hash = db.Column(db.String(150), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(String(150), unique=True)
+    password_hash: Mapped[str] = mapped_column(String(150))
+    is_admin: Mapped[bool] = mapped_column(default=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
